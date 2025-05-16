@@ -1,9 +1,8 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import React from "react";
-import { Analytics } from "@vercel/analytics/react";
-import { ThemeProvider } from "@/components/theme-provider";
 import Umami from "@/components/umami";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "咱衍天宗每天都得算几卦",
@@ -32,16 +31,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cn" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://registry.npmmirror.com/lxgw-wenkai-screen-web/latest/files/lxgwwenkaiscreen/result.css"
+        />
+      </head>
       <body>
         <ThemeProvider
+          enableSystem
           attribute="class"
           defaultTheme="system"
-          enableSystem
           disableTransitionOnChange
         >
           {children}
         </ThemeProvider>
-        {process.env.VERCEL && <Analytics />}
         <Umami />
       </body>
     </html>

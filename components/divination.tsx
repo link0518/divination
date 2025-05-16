@@ -7,12 +7,15 @@ import Result, { ResultObj } from "@/components/result";
 import Question from "@/components/question";
 import ResultAI from "@/components/result-ai";
 import { animateChildren } from "@/lib/animate";
-import { Button } from "@/components/ui/button";
 import guaIndexData from "@/lib/data/gua-index.json";
 import guaListData from "@/lib/data/gua-list.json";
-import { BrainCircuit, ListRestart } from "lucide-react";
 import { getAnswer } from "@/app/server";
 import { readStreamableValue } from "ai/rsc";
+import { Button } from "./ui/button";
+import { BrainCircuit, ListRestart } from "lucide-react";
+import { ERROR_PREFIX } from "@/lib/constant";
+
+const AUTO_DELAY = 600;
 
 function Divination() {
   const [error, setError] = useState<string>("");
@@ -27,6 +30,7 @@ function Divination() {
       const { data, error } = await getAnswer(
         question,
         resultObj!.guaMark,
+        resultObj!.guaTitle,
         resultObj!.guaResult,
         resultObj!.guaChange,
       );
@@ -37,6 +41,10 @@ function Divination() {
       if (data) {
         let ret = "";
         for await (const delta of readStreamableValue(data)) {
+          if (delta.startsWith(ERROR_PREFIX)) {
+            setError(delta.slice(ERROR_PREFIX.length));
+            return;
+          }
           ret += delta;
           setCompletion(ret);
         }
@@ -59,6 +67,16 @@ function Divination() {
   const [resultAi, setResultAi] = useState(false);
 
   const flexRef = useRef<HTMLDivElement>(null);
+
+  const [count, setCount] = useState(0);
+
+  // 自动卜筮
+  useEffect(() => {
+    if (rotation || resultObj || count >= 6 || !question) {
+      return;
+    }
+    setTimeout(startClick, AUTO_DELAY);
+  }, [question, rotation]);
 
   useEffect(() => {
     if (!flexRef.current) {
@@ -94,6 +112,7 @@ function Divination() {
     }
     setFrontList([bool(), bool(), bool()]);
     setRotation(true);
+    setCount(count + 1);
   }
 
   async function testClick() {
@@ -107,6 +126,7 @@ function Divination() {
     setHexagramList([]);
     setQuestion("");
     setResultAi(false);
+    setCount(0);
     stop();
   }
 
@@ -156,12 +176,11 @@ function Divination() {
     setResultObj({
       // 例：26.山天大畜
       guaMark: `${(guaIndex + 1).toString().padStart(2, "0")}.${guaName2}`,
-      // 例：周易第26卦_大畜卦(山天大畜)_艮上乾下
-      guaResult: `周易第${
-        guaIndex + 1
-      }卦_${guaName1}卦(${guaName2}_${guaDesc})`,
+      guaTitle: `周易第${guaIndex + 1}卦`,
+      // 例：大畜卦(山天大畜)_艮上乾下
+      guaResult: `${guaName1}卦(${guaName2})_${guaDesc}`,
       guaChange:
-        changeList.length === 0 ? "无变爻" : `变爻：${changeList.toString()}`,
+        changeList.length === 0 ? "无变爻" : `变爻: ${changeList.toString()}`,
     });
   }
 
@@ -184,38 +203,42 @@ function Divination() {
 
       {!inputQuestion && !showResult && (
         <div className="relative">
-          <Button onClick={startClick} disabled={rotation} size="sm">
-            卜筮
-          </Button>
-          <span className="absolute bottom-0 pl-2 text-muted-foreground">{`${hexagramList.length}/6`}</span>
+          <span className="pl-2 text-lg font-medium">
+            🎲 第{" "}
+            <span className="font-mono text-xl font-bold text-orange-500">
+              {count === 0 ? "-/-" : `${count}/6`}
+            </span>{" "}
+            次卜筮
+          </span>
         </div>
       )}
 
       {!inputQuestion && hexagramList.length != 0 && (
-        <Hexagram list={hexagramList} />
-      )}
-
-      {showResult && (
-        <>
-          <Result {...resultObj} />
-          <div className="flex gap-4">
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={restartClick}
-              disabled={rotation}
-            >
-              <ListRestart size={18} className="mr-1" />
-              重来
-            </Button>
-            {resultAi ? null : (
-              <Button size="sm" onClick={aiClick} disabled={rotation}>
-                <BrainCircuit size={16} className="mr-1" />
-                AI 解读
-              </Button>
-            )}
-          </div>
-        </>
+        <div className="flex max-w-md gap-2">
+          <Hexagram list={hexagramList} />
+          {showResult && (
+            <div className="flex flex-col justify-around">
+              <Result {...resultObj} />
+              <div className="flex flex-col gap-2 sm:px-6">
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={restartClick}
+                  disabled={rotation}
+                >
+                  <ListRestart size={18} className="mr-1" />
+                  重来
+                </Button>
+                {resultAi ? null : (
+                  <Button size="sm" onClick={aiClick} disabled={rotation}>
+                    <BrainCircuit size={16} className="mr-1" />
+                    AI 解读
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {resultAi && (
