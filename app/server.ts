@@ -25,15 +25,15 @@ export async function getAnswer(
     );
     const guaDetail = await res.text();
     const explain = guaDetail
-      。match(/(\*\*台灣張銘仁[\s\S]*?)(?=周易第\d+卦)/)?.[1]
-      。replaceAll("\n\n", "\n");
+      .match(/(\*\*台灣張銘仁[\s\S]*?)(?=周易第\d+卦)/)?.[1]
+      .replaceAll("\n\n", "\n");
 
     const changeList: string[] = [];
     if (guaChange !== "无变爻") {
       guaChange
-        。split(":")[1]
-        。trim()
-        。split(",")
+        .split(":")[1]
+        .trim()
+        .split(",")
         .forEach((change) => {
           const detail = guaDetail
             .match(`(\\*\\*${change}變卦[\\s\\S]*?)(?=${guaTitle}|$)`)?.[1]
