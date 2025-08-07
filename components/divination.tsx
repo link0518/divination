@@ -28,7 +28,7 @@ function Divination() {
     setIsLoading(true);
     try {
       const { data, error } = await getAnswer(
-        question,
+        questionSupplement || question, // 优先使用补充说明，如果没有则使用原问题
         resultObj!.guaMark,
         resultObj!.guaTitle,
         resultObj!.guaResult,
@@ -63,6 +63,12 @@ function Divination() {
 
   const [resultObj, setResultObj] = useState<ResultObj | null>(null);
   const [question, setQuestion] = useState("");
+  const [questionSupplement, setQuestionSupplement] = useState("");
+
+  const handleSetQuestion = (displayText: string, supplementText?: string) => {
+    setQuestion(displayText);
+    setQuestionSupplement(supplementText || displayText);
+  };
 
   const [resultAi, setResultAi] = useState(false);
 
@@ -125,9 +131,9 @@ function Divination() {
     setResultObj(null);
     setHexagramList([]);
     setQuestion("");
+    setQuestionSupplement("");
     setResultAi(false);
     setCount(0);
-    stop();
   }
 
   function aiClick() {
@@ -191,7 +197,7 @@ function Divination() {
       ref={flexRef}
       className="gap mx-auto flex h-0 w-[90%] flex-1 flex-col flex-nowrap items-center"
     >
-      <Question question={question} setQuestion={setQuestion} />
+      <Question question={question} setQuestion={handleSetQuestion} />
 
       {!resultAi && !inputQuestion && (
         <Coin

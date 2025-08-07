@@ -1,5 +1,8 @@
+"use client";
 import React from "react";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Header() {
   return (
@@ -9,7 +12,17 @@ export default function Header() {
           <span className="text-2xl">🦊</span>
           <span>毛毛狐卜卦助手</span>
         </div>
-        <ModeToggle />
+        <div className="flex items-center gap-2">
+          <ModeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => window.location.reload()}
+            title="回到主页"
+          >
+            <Home className="h-[1.2rem] w-[1.2rem]" />
+          </Button>
+        </div>
       </div>
     </header>
   );
