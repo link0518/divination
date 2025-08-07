@@ -5,11 +5,11 @@ import Umami from "@/components/umami";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
-  title: "咱衍天宗每天都得算几卦",
+  title: "毛毛狐算卦助手",
   description:
     "通过进行六次硬币的随机卜筮，生成卦象",
   appleWebApp: {
-    title: "衍天宗",
+    title: "毛毛狐算卦助手",
   },
 };
 
