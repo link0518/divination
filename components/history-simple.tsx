@@ -171,19 +171,6 @@ export const saveToHistory = (
   guaChange: string,
   interpretation?: string
 ) => {
-  const record: HistoryRecord = {
-    id: Date.now().toString(),
-    question,
-    hexagram: guaMark,
-    hexagramName: guaResult,
-    interpretation: interpretation || '',
-    timestamp: Date.now(),
-    guaMark,
-    guaTitle,
-    guaResult,
-    guaChange
-  }
-
   const saved = localStorage.getItem('divination-history')
   let history: HistoryRecord[] = []
   
@@ -195,7 +182,38 @@ export const saveToHistory = (
     }
   }
 
-  history.unshift(record)
+  // 查找是否已存在相同的记录（基于问题和卦象匹配）
+  const existingIndex = history.findIndex(record => 
+    record.question === question && 
+    record.guaMark === guaMark &&
+    record.guaResult === guaResult &&
+    record.guaChange === guaChange
+  )
+
+  if (existingIndex !== -1) {
+    // 如果找到已存在的记录
+    if (interpretation && interpretation.trim() !== '') {
+      // 如果提供了AI解读，则更新该记录
+      history[existingIndex].interpretation = interpretation
+    }
+    // 如果没有提供AI解读，说明是重复调用，直接返回不做任何操作
+  } else {
+    // 如果没有找到相同记录，则创建新记录
+    const timestamp = Date.now()
+    const record: HistoryRecord = {
+      id: `${timestamp}-${Math.random().toString(36).substr(2, 9)}`,
+      question,
+      hexagram: guaMark,
+      hexagramName: guaResult,
+      interpretation: interpretation || '',
+      timestamp,
+      guaMark,
+      guaTitle,
+      guaResult,
+      guaChange
+    }
+    history.unshift(record)
+  }
   
   // 限制历史记录数量，最多保存100条
   if (history.length > 100) {
