@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import todayJson from "@/lib/data/today.json";
 import { Button } from "@/components/ui/button";
@@ -13,15 +13,14 @@ interface TodayItem {
 const todayData: TodayItem[] = todayJson;
 
 function Question(props: { question: string; setQuestion: any; questionSupplement?: string }) {
-  const inputRef = createRef<HTMLTextAreaElement>();
+  const [inputValue, setInputValue] = useState("");
 
   function startClick() {
-    const value = inputRef.current?.value;
-    if (value === "") {
+    if (inputValue === "") {
       return;
     }
     // 手动输入的问题，显示和解读都用同一个内容
-    props.setQuestion(value, value);
+    props.setQuestion(inputValue, inputValue);
   }
 
   function todayClick(index: number) {
@@ -41,7 +40,8 @@ function Question(props: { question: string; setQuestion: any; questionSupplemen
         <>
           <label>您想算点什么？</label>
           <Textarea
-            ref={inputRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             placeholder="毛毛狐 将 为您解读"
             className="resize-none"
             rows={4}
