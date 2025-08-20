@@ -187,7 +187,7 @@ export default function History() {
               </Badge>
               {searchTerm && (
                 <Badge variant="outline" className="text-sm">
-                  搜索: "{searchTerm}"
+                  搜索: &quot;{searchTerm}&quot;
                 </Badge>
               )}
             </div>

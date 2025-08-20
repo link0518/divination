@@ -93,8 +93,13 @@ function Divination() {
     if (rotation || resultObj || count >= 6 || !question) {
       return;
     }
-    setTimeout(startClick, AUTO_DELAY);
-  }, [question, rotation]);
+    const timer = setTimeout(() => {
+      if (!rotation && !resultObj && count < 6 && question) {
+        startClick();
+      }
+    }, AUTO_DELAY);
+    return () => clearTimeout(timer);
+  }, [question, rotation, count, resultObj]);
 
   useEffect(() => {
     if (!flexRef.current) {
