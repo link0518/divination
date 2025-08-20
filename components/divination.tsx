@@ -49,10 +49,10 @@ function Divination() {
           ret += delta;
           setCompletion(ret);
         }
-        // AI解读完成后保存到历史记录
+        // AI解读完成后更新历史记录
         if (ret && resultObj) {
           saveToHistory(
-            question,
+            question, // 使用相同的 question，确保能匹配到之前的记录
             resultObj.guaMark,
             resultObj.guaTitle,
             resultObj.guaResult,

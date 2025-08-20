@@ -349,11 +349,13 @@ export const saveToHistory = (
     }
   }
 
-  // 查找是否已存在相同的记录（基于问题和卦象匹配）
+  // 查找是否已存在相同的记录（基于问题和卦象匹配，允许5秒内的时间差）
+  const now = Date.now()
   const existingIndex = history.findIndex(record => 
     record.question === question && 
     record.guaMark === guaMark &&
-    record.guaResult === guaResult
+    record.guaResult === guaResult &&
+    (now - record.timestamp) < 5000 // 5秒内的记录认为是同一次占卜
   )
 
   if (existingIndex !== -1 && interpretation) {
