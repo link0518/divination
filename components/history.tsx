@@ -349,19 +349,22 @@ export const saveToHistory = (
     }
   }
 
-  // 查找是否已存在相同的记录（基于问题和卦象匹配，允许5秒内的时间差）
-  const now = Date.now()
+  // 查找是否已存在相同的记录（基于问题和卦象匹配）
   const existingIndex = history.findIndex(record => 
     record.question === question && 
     record.guaMark === guaMark &&
     record.guaResult === guaResult &&
-    (now - record.timestamp) < 5000 // 5秒内的记录认为是同一次占卜
+    record.guaChange === guaChange
   )
 
-  if (existingIndex !== -1 && interpretation) {
-    // 如果找到已存在的记录且提供了AI解读，则更新该记录
-    history[existingIndex].interpretation = interpretation
-  } else if (existingIndex === -1) {
+  if (existingIndex !== -1) {
+    // 如果找到已存在的记录
+    if (interpretation && interpretation.trim() !== '') {
+      // 如果提供了AI解读，则更新该记录
+      history[existingIndex].interpretation = interpretation
+    }
+    // 如果没有提供AI解读，说明是重复调用，直接返回不做任何操作
+  } else {
     // 如果没有找到相同记录，则创建新记录
     const timestamp = Date.now()
     const record: HistoryRecord = {
