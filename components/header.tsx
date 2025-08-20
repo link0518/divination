@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Home } from "lucide-react";
+import { Home, History as HistoryIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import History from "@/components/history";
 
 export default function Header() {
   return (
@@ -13,6 +14,7 @@ export default function Header() {
           <span>毛毛狐卜卦助手</span>
         </div>
         <div className="flex items-center gap-2">
+          <History />
           <ModeToggle />
           <Button
             variant="ghost"

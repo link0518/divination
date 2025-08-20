@@ -14,6 +14,7 @@ import { readStreamableValue } from "ai/rsc";
 import { Button } from "./ui/button";
 import { BrainCircuit, ListRestart } from "lucide-react";
 import { ERROR_PREFIX } from "@/lib/constant";
+import { saveToHistory } from "@/components/history-simple";
 
 const AUTO_DELAY = 600;
 
@@ -47,6 +48,17 @@ function Divination() {
           }
           ret += delta;
           setCompletion(ret);
+        }
+        // AI解读完成后保存到历史记录
+        if (ret && resultObj) {
+          saveToHistory(
+            question,
+            resultObj.guaMark,
+            resultObj.guaTitle,
+            resultObj.guaResult,
+            resultObj.guaChange,
+            ret
+          );
         }
       }
     } catch (err: any) {
@@ -179,7 +191,7 @@ function Divination() {
 
     const guaDesc = guaDict1[upIndex] + "上" + guaDict1[downIndex] + "下";
 
-    setResultObj({
+    const newResultObj = {
       // 例：26.山天大畜
       guaMark: `${(guaIndex + 1).toString().padStart(2, "0")}.${guaName2}`,
       guaTitle: `周易第${guaIndex + 1}卦`,
@@ -187,7 +199,18 @@ function Divination() {
       guaResult: `${guaName1}卦(${guaName2})_${guaDesc}`,
       guaChange:
         changeList.length === 0 ? "无变爻" : `变爻: ${changeList.toString()}`,
-    });
+    };
+    
+    setResultObj(newResultObj);
+    
+    // 卦象生成后立即保存基础历史记录（不含AI解读）
+    saveToHistory(
+      question,
+      newResultObj.guaMark,
+      newResultObj.guaTitle,
+      newResultObj.guaResult,
+      newResultObj.guaChange
+    );
   }
 
   const showResult = resultObj !== null;
