@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Coin from "@/components/coin";
 import Hexagram, { HexagramObj } from "@/components/hexagram";
 import { bool } from "aimless.js";
@@ -88,6 +88,18 @@ function Divination() {
 
   const [count, setCount] = useState(0);
 
+  const startClick = useCallback(() => {
+    if (rotation) {
+      return;
+    }
+    if (hexagramList.length >= 6) {
+      setHexagramList([]);
+    }
+    setFrontList([bool(), bool(), bool()]);
+    setRotation(true);
+    setCount(prev => prev + 1);
+  }, [rotation, hexagramList.length]);
+
   // 自动卜筮
   useEffect(() => {
     if (rotation || resultObj || count >= 6 || !question) {
@@ -99,7 +111,7 @@ function Divination() {
       }
     }, AUTO_DELAY);
     return () => clearTimeout(timer);
-  }, [question, rotation, count, resultObj]);
+  }, [question, rotation, count, resultObj, startClick]);
 
   useEffect(() => {
     if (!flexRef.current) {
@@ -124,18 +136,6 @@ function Divination() {
       setResult(newList);
       return newList;
     });
-  }
-
-  function startClick() {
-    if (rotation) {
-      return;
-    }
-    if (hexagramList.length >= 6) {
-      setHexagramList([]);
-    }
-    setFrontList([bool(), bool(), bool()]);
-    setRotation(true);
-    setCount(count + 1);
   }
 
   async function testClick() {

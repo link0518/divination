@@ -108,9 +108,9 @@ export default function History() {
 
   const getRecordIcon = (record: HistoryRecord) => {
     if (record.interpretation && record.interpretation.trim() !== '') {
-      return <Sparkles className="h-4 w-4 text-yellow-500" title="已有AI解读" />
+      return <Sparkles className="h-4 w-4 text-yellow-500" />
     }
-    return <BookOpen className="h-4 w-4 text-blue-500" title="仅有卦象" />
+    return <BookOpen className="h-4 w-4 text-blue-500" />
   }
 
   const getFilterCount = (type: 'all' | 'with-ai' | 'without-ai') => {
