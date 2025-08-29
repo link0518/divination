@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RotateCw } from "lucide-react";
+import { RotateCw, Copy, Check } from "lucide-react";
 import Markdown from "react-markdown";
 
 function ResultAI({
@@ -16,6 +16,7 @@ function ResultAI({
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setAutoScroll(isLoading);
@@ -52,6 +53,16 @@ function ResultAI({
     setAutoScroll(hitBottom);
   }
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(completion);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('复制失败:', err);
+    }
+  };
+
   return (
     <div className="h-0 w-full flex-1 sm:max-w-md md:max-w-2xl">
       {isLoading && (
@@ -77,11 +88,26 @@ function ResultAI({
         ) : (
           <Markdown className="prose dark:prose-invert">{completion}</Markdown>
         )}
-        {!isLoading && (
-          <Button onClick={onCompletion} size="sm" className="mt-2">
-            <RotateCw size={18} className="mr-1" />
-            重新生成
-          </Button>
+        {!isLoading && completion && (
+          <div className="flex gap-2 mt-2">
+            <Button onClick={copyToClipboard} size="sm" variant="outline">
+              {copied ? (
+                <>
+                  <Check size={16} className="mr-1" />
+                  已复制
+                </>
+              ) : (
+                <>
+                  <Copy size={16} className="mr-1" />
+                  复制解读
+                </>
+              )}
+            </Button>
+            <Button onClick={onCompletion} size="sm">
+              <RotateCw size={18} className="mr-1" />
+              重新生成
+            </Button>
+          </div>
         )}
       </div>
     </div>
