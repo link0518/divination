@@ -14,7 +14,7 @@ import { readStreamableValue } from "ai/rsc";
 import { Button } from "./ui/button";
 import { BrainCircuit, ListRestart } from "lucide-react";
 import { ERROR_PREFIX } from "@/lib/constant";
-import { saveToHistory } from "@/components/history-simple";
+import { saveToHistory } from "@/components/history";
 
 const AUTO_DELAY = 600;
 

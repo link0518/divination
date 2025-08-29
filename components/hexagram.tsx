@@ -12,7 +12,7 @@ function Hexagram(props: { list: HexagramObj[] }) {
     <div className="flex h-52 w-56 shrink-0 flex-col-reverse gap-1.5 overflow-hidden rounded-md border bg-secondary py-3 shadow-inner dark:border-0 dark:shadow-none sm:h-60 sm:w-72">
       {props.list.map((value, index) => {
         return (
-          <div key={index} className="flex flex-col-reverse gap-1.5">
+          <div key={`hexagram-line-${index}-${value.yang}-${value.change}`} className="flex flex-col-reverse gap-1.5">
             {value.separate && <div className="h-0.5 sm:h-1" />}
             <Line change={value.change} yang={value.yang} />
           </div>

@@ -219,13 +219,25 @@ export default function History() {
           ) : (
             <div className="space-y-3">
               {filteredHistory.map((record, index) => (
-                <Card key={record.id} className="relative hover:shadow-md transition-shadow">
+                <Dialog key={record.id}>
+                  <DialogTrigger asChild>
+                    <Card className="relative hover:shadow-md transition-shadow cursor-pointer">
                   <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                    <div className="flex justify-between items-start gap-3 min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex items-center gap-2 mb-1 min-w-0">
                           {getRecordIcon(record)}
-                          <CardTitle className="text-base truncate">{record.question}</CardTitle>
+                          <h3 
+                            className="text-base font-semibold flex-1 min-w-0" 
+                            style={{
+                              overflow: 'hidden !important',
+                              textOverflow: 'ellipsis !important',
+                              whiteSpace: 'nowrap !important',
+                              maxWidth: '100%'
+                            }}
+                          >
+                            {record.question}
+                          </h3>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Clock size={12} />
@@ -235,55 +247,14 @@ export default function History() {
                           </Badge>
                         </div>
                       </div>
-                      <div className="flex gap-1 shrink-0">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm" title="查看详情">
-                              <Eye size={14} />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-3xl max-h-[80vh]">
-                            <DialogHeader>
-                              <DialogTitle className="text-left">{record.question}</DialogTitle>
-                              <DialogDescription className="flex items-center gap-2">
-                                <Calendar size={12} />
-                                {formatDate(record.timestamp)}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <ScrollArea className="max-h-[60vh]">
-                              <div className="space-y-6 pr-4">
-                                <div>
-                                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                                    <BookOpen size={16} />
-                                    卦象结果
-                                  </h4>
-                                  <div className="bg-muted/50 p-4 rounded-lg border">
-                                    <div className="font-medium text-primary mb-1">{record.guaTitle}</div>
-                                    <div className="text-lg font-semibold mb-2">{record.guaResult}</div>
-                                    <div className="text-sm text-muted-foreground italic">
-                                      {record.guaChange}
-                                    </div>
-                                  </div>
-                                </div>
-                                {record.interpretation && record.interpretation.trim() !== '' && (
-                                  <div>
-                                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                                      <Sparkles size={16} />
-                                      AI 解读
-                                    </h4>
-                                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border whitespace-pre-wrap text-sm leading-relaxed">
-                                      {record.interpretation}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </ScrollArea>
-                          </DialogContent>
-                        </Dialog>
+                      <div className="flex gap-1 flex-shrink-0 ml-2">
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => deleteRecord(record.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteRecord(record.id);
+                          }}
                           title="删除记录"
                           className="text-destructive hover:text-destructive"
                         >
@@ -319,7 +290,46 @@ export default function History() {
                       )}
                     </div>
                   </CardContent>
-                </Card>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl max-h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle className="text-left">{record.question}</DialogTitle>
+                      <DialogDescription className="flex items-center gap-2">
+                        <Calendar size={12} />
+                        {formatDate(record.timestamp)}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <ScrollArea className="max-h-[60vh]">
+                      <div className="space-y-6 pr-4">
+                        <div>
+                          <h4 className="font-semibold mb-3 flex items-center gap-2">
+                            <BookOpen size={16} />
+                            卦象结果
+                          </h4>
+                          <div className="bg-muted/50 p-4 rounded-lg border">
+                            <div className="font-medium text-primary mb-1">{record.guaTitle}</div>
+                            <div className="text-lg font-semibold mb-2">{record.guaResult}</div>
+                            <div className="text-sm text-muted-foreground italic">
+                              {record.guaChange}
+                            </div>
+                          </div>
+                        </div>
+                        {record.interpretation && record.interpretation.trim() !== '' && (
+                          <div>
+                            <h4 className="font-semibold mb-3 flex items-center gap-2">
+                              <Sparkles size={16} />
+                              AI 解读
+                            </h4>
+                            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border whitespace-pre-wrap text-sm leading-relaxed">
+                              {record.interpretation}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
               ))}
             </div>
           )}

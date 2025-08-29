@@ -28,7 +28,7 @@ function Coin(props: {
     <div className="flex w-full max-w-md justify-around rounded-md border bg-secondary p-4 shadow dark:border-0 dark:shadow-none sm:p-6">
       {props.frontList.map((value, index) => (
         <CoinItem
-          key={index}
+          key={`coin-${index}-${value}`}
           front={value}
           lastFront={lastFront[index]}
           rotation={props.rotation}
