@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import React from "react";
 import Umami from "@/components/umami";
 import { ThemeProvider } from "next-themes";
+import SplashScreen from "@/components/splash-screen";
 
 export const metadata: Metadata = {
   title: "毛毛狐卜卦助手",
@@ -44,6 +45,7 @@ export default function RootLayout({
           defaultTheme="system"
           disableTransitionOnChange
         >
+          <SplashScreen />
           {children}
         </ThemeProvider>
         <Umami />
