@@ -86,13 +86,13 @@ export default function SplashScreen() {
                 {/* Typography */}
                 <div className="mt-12 flex flex-col items-center space-y-4">
                     <div className={cn(
-                        "text-2xl md:text-3xl font-medium tracking-[0.6em] text-[#2c2c2c] dark:text-[#e5e5e5]",
+                        "text-2xl md:text-3xl font-medium tracking-[0.6em] indent-[0.6em] text-[#2c2c2c] dark:text-[#e5e5e5]",
                         "animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards motion-reduce:animate-none"
                     )}>
                         大道五十
                     </div>
                     <div className={cn(
-                        "text-lg md:text-xl font-light tracking-[0.8em] text-[#57534e] dark:text-[#a8a29e]",
+                        "text-lg md:text-xl font-light tracking-[0.8em] indent-[0.8em] text-[#57534e] dark:text-[#a8a29e]",
                         "animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 fill-mode-forwards motion-reduce:animate-none"
                     )}>
                         天衍四九
