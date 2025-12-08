@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import React from "react";
 import Umami from "@/components/umami";
 import { ThemeProvider } from "next-themes";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
+export const viewport = {
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,
