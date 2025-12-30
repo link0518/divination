@@ -15,6 +15,8 @@ import { Button } from "./ui/button";
 import { BrainCircuit, ListRestart } from "lucide-react";
 import { ERROR_PREFIX } from "@/lib/constant";
 import { saveToHistory } from "@/components/history";
+import { LiuyaoEngine, YaoValue, LiuyaoResult, LiuyaoInput, TianGan, DiZhi } from "@/lib/liuyao/engine";
+import { Lunar, Solar } from "lunar-javascript";
 
 const AUTO_DELAY = 600;
 
@@ -23,10 +25,78 @@ function Divination() {
   const [isLoading, setIsLoading] = useState(false);
   const [completion, setCompletion] = useState<string>("");
 
+  function getEngineResult(hexagrams: HexagramObj[]) {
+    if (hexagrams.length !== 6) return undefined;
+
+    // 1. 转换爻值
+    // HexagramObj: { yang: boolean, change: boolean | null }
+    // 6=老陰(動): yang=false, change=true
+    // 7=少陽(靜): yang=true, change=false
+    // 8=少陰(靜): yang=false, change=false
+    // 9=老陽(動): yang=true, change=true
+    const yaoValues: YaoValue[] = hexagrams.map(h => {
+      if (h.yang) {
+        return h.change ? 9 : 7;
+      } else {
+        return h.change ? 6 : 8;
+      }
+    }) as unknown as [YaoValue, YaoValue, YaoValue, YaoValue, YaoValue, YaoValue];
+
+    // 2. 获取当前时间干支 (Lunar)
+    const solar = Solar.fromDate(new Date());
+    const lunar = solar.getLunar();
+    const dayStem = lunar.getDayGan() as TianGan;
+    const dayBranch = lunar.getDayZhi() as DiZhi;
+    const monthBranch = lunar.getMonthZhi() as DiZhi;
+
+    // 3. 调用引擎
+    const input: LiuyaoInput = {
+      yaoValues: yaoValues as [YaoValue, YaoValue, YaoValue, YaoValue, YaoValue, YaoValue],
+      dayStem,
+      dayBranch,
+      monthBranch,
+    };
+
+    const result = LiuyaoEngine.calculate(input);
+
+    // 4. 格式化输出给 AI 的 prompt
+    const { benGua, bianGua, fuShenList, xunKong, yaoList, movingYaoPositions } = result;
+
+    let report = `起卦时间：${lunar.getYearInGanZhi()}年 ${lunar.getMonthInGanZhi()}月 ${lunar.getDayInGanZhi()}日 (旬空: ${xunKong.join("")})\n`;
+    report += `本卦：${benGua.gongWuXing}${benGua.gong}宫 - ${benGua.name} (六親:${benGua.gongWuXing})\n`;
+    if (bianGua) {
+      report += `变卦：${bianGua.name}\n`;
+    }
+
+    report += `\n【六爻详解】\n`;
+    yaoList.forEach(yao => {
+      const moveStr = yao.isMoving ? (yao.changedNaJia ? ` -> 动化${yao.changedNaJia}${yao.changedYinYang}` : ' -> 动') : '';
+      const shiYing = yao.isShiYao ? ' (世)' : (yao.isYingYao ? ' (应)' : '');
+      const mark = movingYaoPositions.includes(yao.position) ? 'O' : (yao.isShiYao || yao.isYingYao ? '*' : '-');
+      report += `${yao.position}爻 ${yao.yinYang} ${yao.naJia}(${yao.liuQin}) ${yao.liuShen}${shiYing} [${yao.wangShuaiByMonth} / ${yao.wangShuaiByDay}]${moveStr}\n`;
+      if (yao.jinTuiShen) {
+        report += `   >>> 动化${yao.jinTuiShen}\n`;
+      }
+    });
+
+    if (fuShenList.length > 0) {
+      report += `\n【伏神】\n`;
+      fuShenList.forEach(fu => {
+        report += `伏神 ${fu.liuQin}${fu.diZhi}(${fu.wuXing}) 藏于 ${fu.position}爻 之飞神 ${fu.feiShenDiZhi}(${fu.feiShenWuXing}) 下，关系：${fu.relation}\n`;
+      });
+    }
+
+    return report;
+  }
+
   async function onCompletion() {
     setError("");
     setCompletion("");
     setIsLoading(true);
+
+    // 计算专业排盘数据
+    const engineReport = getEngineResult(hexagramList);
+
     try {
       const { data, error } = await getAnswer(
         questionSupplement || question, // 优先使用补充说明，如果没有则使用原问题
@@ -34,6 +104,7 @@ function Divination() {
         resultObj!.guaTitle,
         resultObj!.guaResult,
         resultObj!.guaChange,
+        engineReport // 传入新参数
       );
       if (error) {
         setError(error);
@@ -205,9 +276,9 @@ function Divination() {
       guaChange:
         changeList.length === 0 ? "无变爻" : `变爻: ${changeList.toString()}`,
     };
-    
+
     setResultObj(newResultObj);
-    
+
     // 卦象生成后立即保存基础历史记录（不含AI解读）
     saveToHistory(
       question,
