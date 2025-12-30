@@ -18,7 +18,7 @@ export async function getAnswer(
   guaChange: string,
   engineResult?: string
 ) {
-  console.log(prompt, guaTitle, guaResult, guaChange);
+  // console.log(prompt, guaTitle, guaResult, guaChange);
   const stream = createStreamableValue();
   try {
     const res = await fetch(

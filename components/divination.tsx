@@ -112,10 +112,10 @@ function Divination() {
 
     // 计算专业排盘数据
     const engineReport = getEngineResult(hexagramList);
-    console.log("DEBUG: engineReport generated:", engineReport ? "Yes" : "No");
+    // console.log("DEBUG: engineReport generated:", engineReport ? "Yes" : "No");
 
     try {
-      console.log("DEBUG: Calling getAnswer with 6 args");
+      // console.log("DEBUG: Calling getAnswer with 6 args");
       const { data, error } = await getAnswer(
         questionSupplement || question, // 优先使用补充说明，如果没有则使用原问题
         resultObj!.guaMark,
@@ -124,7 +124,7 @@ function Divination() {
         resultObj!.guaChange,
         engineReport // 传入新参数
       );
-      console.log("DEBUG: getAnswer returned", { data: !!data, error });
+      // console.log("DEBUG: getAnswer returned", { data: !!data, error });
       if (error) {
         setError(error);
         return;
