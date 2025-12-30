@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, Eye, Clock, History as HistoryIcon, Search, Calendar, BookOpen, Sparkles, Filter } from 'lucide-react'
+import Markdown from "react-markdown";
 
 interface HistoryRecord {
   id: string
@@ -38,7 +39,7 @@ export default function History() {
 
     // 搜索过滤
     if (searchTerm.trim() !== '') {
-      filtered = filtered.filter(record => 
+      filtered = filtered.filter(record =>
         record.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
         record.guaResult.toLowerCase().includes(searchTerm.toLowerCase()) ||
         record.interpretation.toLowerCase().includes(searchTerm.toLowerCase())
@@ -89,7 +90,7 @@ export default function History() {
     const now = new Date()
     const diffTime = now.getTime() - timestamp
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-    
+
     if (diffDays === 0) {
       return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
     } else if (diffDays === 1) {
@@ -133,10 +134,10 @@ export default function History() {
             占卜历史记录
           </DialogTitle>
           <DialogDescription>
-            查看您的占卜历史和AI解读结果，支持搜索和筛选
+            查看您的占卜历史和解读结果，支持搜索和筛选
           </DialogDescription>
         </DialogHeader>
-        
+
         {/* 搜索和筛选区域 */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -192,9 +193,9 @@ export default function History() {
               )}
             </div>
             {history.length > 0 && (
-              <Button 
-                variant="destructive" 
-                size="sm" 
+              <Button
+                variant="destructive"
+                size="sm"
                 onClick={clearHistory}
                 className="shrink-0"
               >
@@ -222,74 +223,74 @@ export default function History() {
                 <Dialog key={record.id}>
                   <DialogTrigger asChild>
                     <Card className="relative hover:shadow-md transition-shadow cursor-pointer">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start gap-3 min-w-0">
-                      <div className="flex-1 min-w-0 overflow-hidden">
-                        <div className="flex items-center gap-2 mb-1 min-w-0">
-                          {getRecordIcon(record)}
-                          <h3 
-                            className="text-base font-semibold flex-1 min-w-0" 
-                            style={{
-                              overflow: 'hidden !important',
-                              textOverflow: 'ellipsis !important',
-                              whiteSpace: 'nowrap !important',
-                              maxWidth: '100%'
-                            }}
-                          >
-                            {record.question}
-                          </h3>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock size={12} />
-                          {formatDate(record.timestamp)}
-                          <Badge variant="outline" className="text-xs px-1 py-0">
-                            #{index + 1}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex gap-1 flex-shrink-0 ml-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteRecord(record.id);
-                          }}
-                          title="删除记录"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {record.guaMark}
-                        </Badge>
-                        <span className="text-sm font-medium text-primary truncate">
-                          {record.guaResult}
-                        </span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {record.guaChange}
-                      </div>
-                      {record.interpretation && record.interpretation.trim() !== '' && (
-                        <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded border-l-2 border-yellow-400">
-                          <div className="flex items-center gap-1 mb-1">
-                            <Sparkles size={10} />
-                            <span className="font-medium">AI解读预览</span>
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start gap-3 min-w-0">
+                          <div className="flex-1 min-w-0 overflow-hidden">
+                            <div className="flex items-center gap-2 mb-1 min-w-0">
+                              {getRecordIcon(record)}
+                              <h3
+                                className="text-base font-semibold flex-1 min-w-0"
+                                style={{
+                                  overflow: 'hidden !important',
+                                  textOverflow: 'ellipsis !important',
+                                  whiteSpace: 'nowrap !important',
+                                  maxWidth: '100%'
+                                }}
+                              >
+                                {record.question}
+                              </h3>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Clock size={12} />
+                              {formatDate(record.timestamp)}
+                              <Badge variant="outline" className="text-xs px-1 py-0">
+                                #{index + 1}
+                              </Badge>
+                            </div>
                           </div>
-                          <div className="line-clamp-2">
-                            {record.interpretation.substring(0, 120)}
-                            {record.interpretation.length > 120 && '...'}
+                          <div className="flex gap-1 flex-shrink-0 ml-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteRecord(record.id);
+                              }}
+                              title="删除记录"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 size={14} />
+                            </Button>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {record.guaMark}
+                            </Badge>
+                            <span className="text-sm font-medium text-primary truncate">
+                              {record.guaResult}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {record.guaChange}
+                          </div>
+                          {record.interpretation && record.interpretation.trim() !== '' && (
+                            <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded border-l-2 border-yellow-400">
+                              <div className="flex items-center gap-1 mb-1">
+                                <Sparkles size={10} />
+                                <span className="font-medium">解读预览</span>
+                              </div>
+                              <div className="line-clamp-2">
+                                {record.interpretation.substring(0, 120)}
+                                {record.interpretation.length > 120 && '...'}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
                     </Card>
                   </DialogTrigger>
                   <DialogContent className="max-w-3xl max-h-[80vh]">
@@ -319,10 +320,10 @@ export default function History() {
                           <div>
                             <h4 className="font-semibold mb-3 flex items-center gap-2">
                               <Sparkles size={16} />
-                              AI 解读
+                              详解
                             </h4>
-                            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border whitespace-pre-wrap text-sm leading-relaxed">
-                              {record.interpretation}
+                            <div className="prose dark:prose-invert text-sm leading-relaxed bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border">
+                              <Markdown>{record.interpretation}</Markdown>
                             </div>
                           </div>
                         )}
@@ -350,7 +351,7 @@ export const saveToHistory = (
 ) => {
   const saved = localStorage.getItem('divination-history')
   let history: HistoryRecord[] = []
-  
+
   if (saved) {
     try {
       history = JSON.parse(saved)
@@ -360,8 +361,8 @@ export const saveToHistory = (
   }
 
   // 查找是否已存在相同的记录（基于问题和卦象匹配）
-  const existingIndex = history.findIndex(record => 
-    record.question === question && 
+  const existingIndex = history.findIndex(record =>
+    record.question === question &&
     record.guaMark === guaMark &&
     record.guaResult === guaResult &&
     record.guaChange === guaChange
@@ -391,7 +392,7 @@ export const saveToHistory = (
     }
     history.unshift(record)
   }
-  
+
   // 限制历史记录数量，最多保存100条
   if (history.length > 100) {
     history = history.slice(0, 100)

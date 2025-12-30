@@ -34,7 +34,7 @@ function ResultAI({
       if (
         !scrollRef.current ||
         scrollRef.current.scrollHeight ===
-          scrollRef.current.clientHeight + scrollRef.current.scrollTop
+        scrollRef.current.clientHeight + scrollRef.current.scrollTop
       ) {
         return;
       }
@@ -70,7 +70,7 @@ function ResultAI({
           <span className="flex-1" />
           <div className="relative -top-4 flex w-fit items-center pr-1 text-muted-foreground sm:left-2 sm:pr-3">
             <RotateCw size={16} className="animate-spin" />
-            <span className="ml-1 text-sm">AI 分析中...</span>
+            <span className="ml-1 text-sm">分析中...</span>
           </div>
         </div>
       )}
@@ -86,7 +86,9 @@ function ResultAI({
             {error}
           </div>
         ) : (
-          <Markdown className="prose dark:prose-invert">{completion}</Markdown>
+          <div className="prose dark:prose-invert">
+            <Markdown>{completion}</Markdown>
+          </div>
         )}
         {!isLoading && completion && (
           <div className="flex gap-2 mt-2">

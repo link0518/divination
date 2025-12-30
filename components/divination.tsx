@@ -391,7 +391,7 @@ function Divination() {
                       className="flex-1"
                     >
                       <BrainCircuit size={16} className="mr-1" />
-                      AI 解读
+                      解卦
                     </Button>
                   )}
                 </div>
