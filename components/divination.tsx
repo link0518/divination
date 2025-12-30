@@ -12,11 +12,18 @@ import guaListData from "@/lib/data/gua-list.json";
 import { getAnswer } from "@/app/server";
 import { readStreamableValue } from "ai/rsc";
 import { Button } from "./ui/button";
-import { BrainCircuit, ListRestart } from "lucide-react";
+import { LiuyaoPanel } from "@/components/liuyao-panel";
+import { BrainCircuit, ListRestart, LayoutTemplate } from "lucide-react";
 import { ERROR_PREFIX } from "@/lib/constant";
 import { saveToHistory } from "@/components/history";
 import { LiuyaoEngine, YaoValue, LiuyaoResult, LiuyaoInput, TianGan, DiZhi } from "@/lib/liuyao/engine";
 import { Lunar, Solar } from "lunar-javascript";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const AUTO_DELAY = 600;
 
@@ -24,6 +31,11 @@ function Divination() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [completion, setCompletion] = useState<string>("");
+  const [engineResultState, setEngineResultState] = useState<{
+    result: LiuyaoResult;
+    lunarDate: string;
+    xunKong: string;
+  } | null>(null);
 
   function getEngineResult(hexagrams: HexagramObj[]) {
     if (hexagrams.length !== 6) return undefined;
@@ -58,11 +70,15 @@ function Divination() {
     };
 
     const result = LiuyaoEngine.calculate(input);
+    const xunKong = result.xunKong.join("");
+    const lunarDate = `${lunar.getYearInGanZhi()}年 ${lunar.getMonthInGanZhi()}月 ${lunar.getDayInGanZhi()}日`;
+
+    setEngineResultState({ result, lunarDate, xunKong });
 
     // 4. 格式化输出给 AI 的 prompt
-    const { benGua, bianGua, fuShenList, xunKong, yaoList, movingYaoPositions } = result;
+    const { benGua, bianGua, fuShenList, yaoList, movingYaoPositions } = result;
 
-    let report = `起卦时间：${lunar.getYearInGanZhi()}年 ${lunar.getMonthInGanZhi()}月 ${lunar.getDayInGanZhi()}日 (旬空: ${xunKong.join("")})\n`;
+    let report = `起卦时间：${lunarDate} (旬空: ${xunKong})\n`;
     report += `本卦：${benGua.gongWuXing}${benGua.gong}宫 - ${benGua.name} (六親:${benGua.gongWuXing})\n`;
     if (bianGua) {
       report += `变卦：${bianGua.name}\n`;
@@ -96,8 +112,10 @@ function Divination() {
 
     // 计算专业排盘数据
     const engineReport = getEngineResult(hexagramList);
+    console.log("DEBUG: engineReport generated:", engineReport ? "Yes" : "No");
 
     try {
+      console.log("DEBUG: Calling getAnswer with 6 args");
       const { data, error } = await getAnswer(
         questionSupplement || question, // 优先使用补充说明，如果没有则使用原问题
         resultObj!.guaMark,
@@ -106,6 +124,7 @@ function Divination() {
         resultObj!.guaChange,
         engineReport // 传入新参数
       );
+      console.log("DEBUG: getAnswer returned", { data: !!data, error });
       if (error) {
         setError(error);
         return;
@@ -222,6 +241,7 @@ function Divination() {
     setQuestionSupplement("");
     setResultAi(false);
     setCount(0);
+    setEngineResultState(null);
   }
 
   function aiClick() {
@@ -322,24 +342,59 @@ function Divination() {
         <div className="flex max-w-md gap-2">
           <Hexagram list={hexagramList} />
           {showResult && (
-            <div className="flex flex-col justify-around">
+            <div className="flex flex-col justify-around gap-4 items-center">
               <Result {...resultObj} />
-              <div className="flex flex-col gap-2 sm:px-6">
+
+
+
+              <div className="flex flex-col gap-2 sm:px-6 w-full items-center">
                 <Button
                   size="sm"
                   variant="destructive"
                   onClick={restartClick}
                   disabled={rotation}
+                  className="w-full"
                 >
                   <ListRestart size={18} className="mr-1" />
                   重来
                 </Button>
-                {resultAi ? null : (
-                  <Button size="sm" onClick={aiClick} disabled={rotation}>
-                    <BrainCircuit size={16} className="mr-1" />
-                    AI 解读
-                  </Button>
-                )}
+                <div className="flex gap-2 w-full justify-between">
+                  {resultAi ? (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!engineResultState || rotation}
+                          className="flex-1"
+                        >
+                          <LayoutTemplate size={16} className="mr-1" />
+                          排盘
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                        <DialogTitle>六爻排盘</DialogTitle>
+                        {engineResultState && (
+                          <LiuyaoPanel
+                            result={engineResultState.result}
+                            lunarDate={engineResultState.lunarDate}
+                            xunKong={engineResultState.xunKong}
+                          />
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                  ) : (
+                    <Button
+                      size="sm"
+                      onClick={aiClick}
+                      disabled={rotation}
+                      className="flex-1"
+                    >
+                      <BrainCircuit size={16} className="mr-1" />
+                      AI 解读
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -354,6 +409,8 @@ function Divination() {
           error={error}
         />
       )}
+
+
     </main>
   );
 }
